@@ -51,8 +51,15 @@ jobs:
 
     - name: Initialize EAS Project
       run: |
-        # Initialize EAS project and create if needed
-        npx eas init --id || npx eas project:init --non-interactive || echo "EAS project setup completed"
+        # Try different approaches to create/link EAS project
+        export EAS_NO_VCS=1
+        npx eas project:create --non-interactive 2>/dev/null || echo "Project might already exist"
+        
+    - name: Setup Android Build Environment
+      run: |
+        # Setup Android SDK and build tools
+        echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         
     - name: Verify project configuration
       run: |
@@ -64,9 +71,24 @@ jobs:
 
     - name: Build APK
       run: |
-        npx eas build --platform android --profile preview --local --output signademy-v1.0.0.apk --clear-cache
+        # Use expo prebuild and build APK directly
+        export EAS_NO_VCS=1
+        export EXPO_NO_TELEMETRY=1
+        
+        echo "🔧 Generating native Android project..."
+        npx expo prebuild --platform android --clean
+        
+        echo "🏗️ Building APK with Gradle..."
+        cd android
+        ./gradlew assembleRelease
+        
+        echo "📦 Copying APK to output..."
+        cp app/build/outputs/apk/release/app-release.apk ../signademy-v1.0.0.apk
+        cd ..
       env:
         EXPO_DEBUG: 1
+        EAS_NO_VCS: 1
+        EXPO_NO_TELEMETRY: 1
 
     - name: Verify APK build
       run: |
