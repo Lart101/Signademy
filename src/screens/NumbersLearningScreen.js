@@ -278,7 +278,7 @@ const NumbersLearningScreen = ({ onBack }) => {
       </View>
 
       {/* Camera Section */}
-      <View style={styles.cameraSection}>
+      <View style={styles.cameraSectionCompact}>
         <Text style={styles.cameraSectionTitle}>Your Turn: Show "{currentNumber}"</Text>
         
         {/* Camera Controls */}
@@ -487,6 +487,18 @@ const styles = {
   },
   cameraSection: {
     flex: 1,
+    backgroundColor: 'white',
+    margin: 16,
+    marginTop: 0,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cameraSectionCompact: {
     backgroundColor: 'white',
     margin: 16,
     marginTop: 0,

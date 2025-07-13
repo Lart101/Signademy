@@ -275,7 +275,7 @@ const LettersLearningScreen = ({ onBack }) => {
       </View>
 
       {/* Camera Section */}
-      <View style={styles.cameraSection}>
+      <View style={styles.cameraSectionCompact}>
         <Text style={styles.cameraSectionTitle}>Your Turn: Show "{currentLetter}"</Text>
         
         {/* Camera Controls */}
@@ -486,6 +486,10 @@ const styles = {
   },
   cameraSection: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  cameraSectionCompact: {
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
