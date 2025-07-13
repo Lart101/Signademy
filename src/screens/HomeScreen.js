@@ -127,14 +127,14 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz }) => {
                 title="Start Learning"
                 description="Choose a category to learn"
                 icon="📚"
-                onPress={() => onSelectCategory('learn')}
+                onPress={() => setActiveTab('learn')}
               />
               
               <MenuCard
                 title="Practice Mode"
                 description="Test your knowledge"
                 icon="🎯"
-                onPress={onStartPractice}
+                onPress={() => setActiveTab('practice')}
               />
               
               <MenuCard
