@@ -117,15 +117,20 @@ export const webViewHTML = `
         const loadingDiv = document.getElementById('loading');
         const placeholder = document.getElementById('placeholder');
 
-        // Initialize the GestureRecognizer with your custom model
-        const createGestureRecognizer = async () => {
+        // Initialize the GestureRecognizer with dynamic model
+        const createGestureRecognizer = async (modelPath = null) => {
             try {
                 const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
                 
-                // Use your custom model hosted on Supabase
+                // Use provided model path or default to letters model
+                const defaultModelPath = "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage//Asl14000imagePART3.task";
+                const modelAssetPath = modelPath || defaultModelPath;
+                
+                console.log('Loading model from:', modelAssetPath);
+                
                 gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
                     baseOptions: {
-                        modelAssetPath: "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage//Asl14000imagePART3.task",
+                        modelAssetPath: modelAssetPath,
                         delegate: "GPU"
                     },
                     runningMode: "IMAGE"
@@ -134,11 +139,12 @@ export const webViewHTML = `
                 loadingDiv.style.display = 'none';
                 statusDiv.textContent = 'Signademy Ready - Start signing!';
                 statusDiv.className = 'status active';
-                console.log('Custom ASL model initialized successfully from Supabase');
+                console.log('Custom ASL model initialized successfully');
                 
                 // Notify React Native that model is loaded
                 window.ReactNativeWebView?.postMessage(JSON.stringify({
-                    type: 'model-loaded'
+                    type: 'model-loaded',
+                    modelPath: modelAssetPath
                 }));
             } catch (error) {
                 console.error('Error loading custom model:', error);
@@ -194,12 +200,19 @@ export const webViewHTML = `
                             }
                         }
                         
-                        // Display gesture results with throttling
+                        // Send gesture detection results to React Native
                         if (results.gestures && results.gestures.length > 0) {
                             gestureOutput.style.display = "block";
                             const categoryName = results.gestures[0][0].categoryName;
-                            const categoryScore = parseFloat(results.gestures[0][0].score * 100).toFixed(0); // Less precision
+                            const categoryScore = parseFloat(results.gestures[0][0].score * 100).toFixed(0);
                             gestureOutput.innerText = \`✋ \${categoryName} (\${categoryScore}%)\`;
+                            
+                            // Notify React Native about detected gesture
+                            window.ReactNativeWebView?.postMessage(JSON.stringify({
+                                type: 'gesture-detected',
+                                gesture: categoryName,
+                                confidence: categoryScore
+                            }));
                         } else {
                             gestureOutput.style.display = "none";
                         }
@@ -258,13 +271,20 @@ export const webViewHTML = `
                     overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
                     statusDiv.textContent = 'Camera disabled';
                     statusDiv.className = 'status inactive';
+                } else if (payload.type === "change-model") {
+                    console.log('Changing model to:', payload.modelPath);
+                    loadingDiv.style.display = 'block';
+                    loadingDiv.textContent = 'Loading new model...';
+                    statusDiv.textContent = 'Loading model...';
+                    statusDiv.className = 'status inactive';
+                    createGestureRecognizer(payload.modelPath);
                 }
             } catch (error) {
                 console.error('Error handling message:', error);
             }
         });
 
-        // For iOS WebView with same throttling
+        // For iOS WebView with same throttling and model switching
         window.addEventListener('message', function(event) {
             try {
                 const payload = JSON.parse(event.data);
@@ -295,6 +315,13 @@ export const webViewHTML = `
                     overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
                     statusDiv.textContent = 'Camera disabled';
                     statusDiv.className = 'status inactive';
+                } else if (payload.type === "change-model") {
+                    console.log('iOS: Changing model to:', payload.modelPath);
+                    loadingDiv.style.display = 'block';
+                    loadingDiv.textContent = 'Loading new model...';
+                    statusDiv.textContent = 'Loading model...';
+                    statusDiv.className = 'status inactive';
+                    createGestureRecognizer(payload.modelPath);
                 }
             } catch (error) {
                 console.error('Error handling iOS message:', error);

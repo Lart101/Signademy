@@ -59,29 +59,6 @@ const SplashScreen = ({ onFinish }) => {
           <Text style={splashStyles.appName}>Signademy</Text>
           <Text style={splashStyles.tagline}>Learn Sign Language</Text>
         </Animated.View>
-
-        {/* Features Icons */}
-        <Animated.View 
-          style={[
-            splashStyles.featuresContainer,
-            { opacity: fadeAnim }
-          ]}
-        >
-          <View style={splashStyles.featureRow}>
-            <View style={splashStyles.featureItem}>
-              <Text style={splashStyles.featureIcon}>📱</Text>
-              <Text style={splashStyles.featureText}>Easy</Text>
-            </View>
-            <View style={splashStyles.featureItem}>
-              <Text style={splashStyles.featureIcon}>🎯</Text>
-              <Text style={splashStyles.featureText}>Accurate</Text>
-            </View>
-            <View style={splashStyles.featureItem}>
-              <Text style={splashStyles.featureIcon}>⚡</Text>
-              <Text style={splashStyles.featureText}>Fast</Text>
-            </View>
-          </View>
-        </Animated.View>
       </View>
 
       {/* Get Started Button */}
@@ -102,10 +79,6 @@ const SplashScreen = ({ onFinish }) => {
             <Text style={splashStyles.buttonText}>Get Started</Text>
             <Text style={splashStyles.buttonIcon}>👋</Text>
           </TouchableOpacity>
-          
-          <Text style={splashStyles.disclaimer}>
-            Kid-friendly • Adult-friendly • Accessible
-          </Text>
         </Animated.View>
       )}
     </View>

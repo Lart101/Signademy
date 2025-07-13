@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { mainStyles } from '../styles/MainStyles';
 
-const LoadingOverlay = ({ modelLoaded, modelError, onRetry }) => {
+const LoadingOverlay = ({ modelLoaded, modelError, onRetry, modelName = "AI Model" }) => {
   if (modelLoaded && !modelError) return null;
 
   if (modelError) {
@@ -11,7 +11,7 @@ const LoadingOverlay = ({ modelLoaded, modelError, onRetry }) => {
         <View style={mainStyles.errorContent}>
           <Text style={mainStyles.errorIcon}>⚠️</Text>
           <Text style={mainStyles.errorTitle}>Connection Error</Text>
-          <Text style={mainStyles.errorText}>Unable to load the AI model</Text>
+          <Text style={mainStyles.errorText}>Unable to load {modelName}</Text>
           <TouchableOpacity style={mainStyles.retryButton} onPress={onRetry}>
             <Text style={mainStyles.retryButtonText}>Try Again</Text>
           </TouchableOpacity>
@@ -27,7 +27,7 @@ const LoadingOverlay = ({ modelLoaded, modelError, onRetry }) => {
           <Text style={mainStyles.loadingIcon}>🤟</Text>
         </View>
         <Text style={mainStyles.loadingTitle}>Signademy</Text>
-        <Text style={mainStyles.loadingText}>Loading AI Model...</Text>
+        <Text style={mainStyles.loadingText}>Loading {modelName}...</Text>
         
         {/* Loading Bar */}
         <View style={mainStyles.loadingBarContainer}>
