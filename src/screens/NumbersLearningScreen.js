@@ -18,6 +18,7 @@ import LetterVideo from '../components/LetterVideo'; // Reuse for numbers
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useFeedbackSounds, useUISounds } from '../hooks/useSoundEffects';
 import { getModelInfo, MODEL_CATEGORIES } from '../config/ModelConfig';
 
 const { width, height } = Dimensions.get('window');
@@ -49,6 +50,10 @@ const NumbersLearningScreen = ({ onBack }) => {
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
   const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  
+  // Sound effects hooks
+  const { playCorrect, playIncorrect, playSuccess, playCompletion } = useFeedbackSounds();
+  const { playButtonPress, playCameraToggle, playPageSwipe } = useUISounds();
 
   // Enhanced message handler for number detection
   const enhancedMessageHandler = (event) => {
@@ -68,6 +73,8 @@ const NumbersLearningScreen = ({ onBack }) => {
       
       if (detectedNumber === currentNumber && !showSuccess) {
         console.log('Numbers - Triggering correct detection!');
+        // Play correct detection sound
+        playCorrect();
         handleCorrectDetection();
       }
     }
@@ -99,6 +106,8 @@ const NumbersLearningScreen = ({ onBack }) => {
       })
     ]).start(() => {
       setShowSuccess(false);
+      // Play success sound when advancing to next number
+      playSuccess();
       advanceToNextNumber();
     });
 
@@ -117,6 +126,7 @@ const NumbersLearningScreen = ({ onBack }) => {
       setCurrentNumberIndex(prev => prev + 1);
     } else {
       // All numbers completed
+      playCompletion();
       setShowCompletion(true);
       setCameraEnabled(false);
     }
@@ -124,6 +134,7 @@ const NumbersLearningScreen = ({ onBack }) => {
 
   // Go back to previous number
   const goBackNumber = () => {
+    playPageSwipe();
     if (currentNumberIndex > 0) {
       setCurrentNumberIndex(prev => prev - 1);
     }
@@ -143,12 +154,14 @@ const NumbersLearningScreen = ({ onBack }) => {
           return;
         }
       }
+      playCameraToggle();
     }
     setCameraEnabled(!cameraEnabled);
   };
 
   // Restart learning
   const restartLearning = () => {
+    playButtonPress();
     setCurrentNumberIndex(0);
     setCompletedNumbers([]);
     setShowCompletion(false);
@@ -172,14 +185,20 @@ const NumbersLearningScreen = ({ onBack }) => {
           <View style={styles.completionButtons}>
             <TouchableOpacity 
               style={styles.completionButton}
-              onPress={restartLearning}
+              onPress={() => {
+                playButtonPress();
+                restartLearning();
+              }}
             >
               <Text style={styles.completionButtonText}>Restart</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={[styles.completionButton, styles.homeButton]}
-              onPress={onBack}
+              onPress={() => {
+                playButtonPress();
+                onBack();
+              }}
             >
               <Text style={[styles.completionButtonText, styles.homeButtonText]}>Go to Home</Text>
             </TouchableOpacity>
@@ -196,7 +215,10 @@ const NumbersLearningScreen = ({ onBack }) => {
         <View style={styles.headerTop}>
           <TouchableOpacity 
             style={styles.backButton} 
-            onPress={currentNumberIndex === 0 ? onBack : goBackNumber}
+            onPress={() => {
+              playButtonPress();
+              currentNumberIndex === 0 ? onBack() : goBackNumber();
+            }}
           >
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
@@ -208,7 +230,10 @@ const NumbersLearningScreen = ({ onBack }) => {
               !permission?.granted && styles.cameraToggleDisabled,
               cameraEnabled && styles.cameraToggleActive
             ]}
-            onPress={toggleCamera}
+            onPress={() => {
+              playButtonPress();
+              toggleCamera();
+            }}
             disabled={!permission?.granted}
           >
             <Text style={[styles.cameraToggleText,
@@ -261,7 +286,10 @@ const NumbersLearningScreen = ({ onBack }) => {
           {!permission?.granted ? (
             <TouchableOpacity 
               style={styles.permissionButton}
-              onPress={requestPermission}
+              onPress={() => {
+                playButtonPress();
+                requestPermission();
+              }}
             >
               <Text style={styles.permissionButtonText}>📷 Grant Camera Permission</Text>
             </TouchableOpacity>
@@ -269,7 +297,10 @@ const NumbersLearningScreen = ({ onBack }) => {
             <View style={styles.cameraControlRow}>
               <TouchableOpacity 
                 style={[styles.cameraControlButton, cameraEnabled ? styles.disableButton : styles.enableButton]}
-                onPress={toggleCamera}
+                onPress={() => {
+                  playButtonPress();
+                  toggleCamera();
+                }}
               >
                 <Text style={styles.cameraControlButtonText}>
                   {cameraEnabled ? '📷 Disable Camera' : '📹 Enable Camera'}
@@ -279,7 +310,10 @@ const NumbersLearningScreen = ({ onBack }) => {
               {cameraEnabled && (
                 <TouchableOpacity 
                   style={styles.flipButton}
-                  onPress={() => setFacing(facing === 'front' ? 'back' : 'front')}
+                  onPress={() => {
+                    playButtonPress();
+                    setFacing(facing === 'front' ? 'back' : 'front');
+                  }}
                 >
                   <Text style={styles.flipButtonText}>🔄</Text>
                 </TouchableOpacity>
@@ -297,13 +331,6 @@ const NumbersLearningScreen = ({ onBack }) => {
             onCameraReady={() => console.log('Camera ready for number learning')}
             facing={facing}
           />
-
-          {/* Optional Ghost Overlay */}
-          {cameraEnabled && (
-            <View style={styles.ghostOverlay}>
-              <Text style={styles.ghostOverlayText}>Position your hand here</Text>
-            </View>
-          )}
         </View>
         
         {!cameraEnabled && permission?.granted && (
@@ -485,24 +512,6 @@ const styles = {
     backgroundColor: '#000',
     position: 'relative',
     minHeight: 200,
-  },
-  ghostOverlay: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-    borderStyle: 'dashed',
-  },
-  ghostOverlayText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   successOverlay: {
     position: 'absolute',

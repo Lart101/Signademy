@@ -18,6 +18,7 @@ import LetterVideo from '../components/LetterVideo';
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useFeedbackSounds, useUISounds } from '../hooks/useSoundEffects';
 import { getModelInfo, MODEL_CATEGORIES } from '../config/ModelConfig';
 
 const { width, height } = Dimensions.get('window');
@@ -49,6 +50,10 @@ const LettersLearningScreen = ({ onBack }) => {
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
   const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  
+  // Sound effects hooks
+  const { playCorrect, playIncorrect, playSuccess, playCompletion } = useFeedbackSounds();
+  const { playButtonPress, playCameraToggle, playPageSwipe } = useUISounds();
 
   // Enhanced message handler for letter detection
   const enhancedMessageHandler = (event) => {
@@ -68,6 +73,8 @@ const LettersLearningScreen = ({ onBack }) => {
       
       if (detectedLetter === currentLetter && !showSuccess) {
         console.log('Triggering correct detection!');
+        // Play correct detection sound
+        playCorrect();
         handleCorrectDetection();
       }
     }
@@ -99,6 +106,8 @@ const LettersLearningScreen = ({ onBack }) => {
       })
     ]).start(() => {
       setShowSuccess(false);
+      // Play success sound when advancing to next letter
+      playSuccess();
       advanceToNextLetter();
     });
 
@@ -117,6 +126,7 @@ const LettersLearningScreen = ({ onBack }) => {
       setCurrentLetterIndex(prev => prev + 1);
     } else {
       // All letters completed
+      playCompletion();
       setShowCompletion(true);
       setCameraEnabled(false);
     }
@@ -124,6 +134,7 @@ const LettersLearningScreen = ({ onBack }) => {
 
   // Go back to previous letter
   const goBackLetter = () => {
+    playPageSwipe();
     if (currentLetterIndex > 0) {
       setCurrentLetterIndex(prev => prev - 1);
     }
@@ -143,12 +154,14 @@ const LettersLearningScreen = ({ onBack }) => {
           return;
         }
       }
+      playCameraToggle();
     }
     setCameraEnabled(!cameraEnabled);
   };
 
   // Restart learning
   const restartLearning = () => {
+    playButtonPress();
     setCurrentLetterIndex(0);
     setCompletedLetters([]);
     setShowCompletion(false);
@@ -172,14 +185,20 @@ const LettersLearningScreen = ({ onBack }) => {
           <View style={styles.completionButtons}>
             <TouchableOpacity 
               style={styles.completionButton}
-              onPress={restartLearning}
+              onPress={() => {
+                playButtonPress();
+                restartLearning();
+              }}
             >
               <Text style={styles.completionButtonText}>Restart</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={[styles.completionButton, styles.homeButton]}
-              onPress={onBack}
+              onPress={() => {
+                playButtonPress();
+                onBack();
+              }}
             >
               <Text style={[styles.completionButtonText, styles.homeButtonText]}>Go to Home</Text>
             </TouchableOpacity>
@@ -196,7 +215,10 @@ const LettersLearningScreen = ({ onBack }) => {
         <View style={styles.headerTop}>
           <TouchableOpacity 
             style={styles.backButton} 
-            onPress={currentLetterIndex === 0 ? onBack : goBackLetter}
+            onPress={() => {
+              playButtonPress();
+              currentLetterIndex === 0 ? onBack() : goBackLetter();
+            }}
           >
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
@@ -261,7 +283,10 @@ const LettersLearningScreen = ({ onBack }) => {
           {!permission?.granted ? (
             <TouchableOpacity 
               style={styles.permissionButton}
-              onPress={requestPermission}
+              onPress={() => {
+                playButtonPress();
+                requestPermission();
+              }}
             >
               <Text style={styles.permissionButtonText}>📷 Grant Camera Permission</Text>
             </TouchableOpacity>
@@ -269,7 +294,10 @@ const LettersLearningScreen = ({ onBack }) => {
             <View style={styles.cameraControlRow}>
               <TouchableOpacity 
                 style={[styles.cameraControlButton, cameraEnabled ? styles.disableButton : styles.enableButton]}
-                onPress={toggleCamera}
+                onPress={() => {
+                  playButtonPress();
+                  toggleCamera();
+                }}
               >
                 <Text style={styles.cameraControlButtonText}>
                   {cameraEnabled ? '📷 Disable Camera' : '📹 Enable Camera'}
@@ -279,7 +307,10 @@ const LettersLearningScreen = ({ onBack }) => {
               {cameraEnabled && (
                 <TouchableOpacity 
                   style={styles.flipButton}
-                  onPress={() => setFacing(facing === 'front' ? 'back' : 'front')}
+                  onPress={() => {
+                    playButtonPress();
+                    setFacing(facing === 'front' ? 'back' : 'front');
+                  }}
                 >
                   <Text style={styles.flipButtonText}>🔄</Text>
                 </TouchableOpacity>
@@ -297,13 +328,6 @@ const LettersLearningScreen = ({ onBack }) => {
             onCameraReady={() => console.log('Camera ready for letter learning')}
             facing={facing}
           />
-
-          {/* Optional Ghost Overlay */}
-          {cameraEnabled && (
-            <View style={styles.ghostOverlay}>
-              <Text style={styles.ghostOverlayText}>Position your hand here</Text>
-            </View>
-          )}
         </View>
         
         {!cameraEnabled && permission?.granted && (
@@ -479,24 +503,6 @@ const styles = {
     backgroundColor: '#000',
     position: 'relative',
     minHeight: 200,
-  },
-  ghostOverlay: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-    borderStyle: 'dashed',
-  },
-  ghostOverlayText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   enableCameraButton: {
     backgroundColor: '#4A90E2',
