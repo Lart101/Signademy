@@ -54,8 +54,11 @@ jobs:
         
     - name: Verify project configuration
       run: |
-        npx expo config
-        npx eas config
+        echo "📋 Expo Configuration:"
+        npx expo config --type public
+        echo ""
+        echo "📋 EAS Build Profiles:"
+        cat eas.json
 
     - name: Build APK
       run: |
