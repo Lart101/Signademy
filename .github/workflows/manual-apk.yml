@@ -8,6 +8,10 @@ on:
         required: false
         default: 'Manual build release'
 
+permissions:
+  contents: write    # Required to create releases and upload files
+  actions: read      # Required for workflow actions
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
