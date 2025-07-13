@@ -1,28 +1,27 @@
 # 🤟 Signademy
 
-**AI-powered sign language learning app with real-time gesture detection**
+**Sign language gesture detection app using Google MediaPipe**
 
-Signademy is a React Native mobile application that uses advanced AI technology to help users learn sign language through real-time gesture detection and recognition.
+Signademy is a React Native mobile application that uses Google's MediaPipe framework to detect sign language gestures through frame-by-frame camera capture.
 
 ## ✨ Features
 
-- 🤖 **Real-time AI Detection** - Uses MediaPipe and custom ASL model for accurate gesture recognition
+- 📷 **Frame-by-Frame Detection** - Captures camera frames every 500ms for gesture analysis
 - 📱 **Cross-platform** - Built with React Native and Expo for iOS and Android
-- 🎨 **Beautiful UI** - Kid-friendly design with smooth animations
-- 📷 **Camera Integration** - Front/back camera switching with optimized capture
-- 🔄 **Live Feedback** - Instant gesture recognition with confidence scores
-- ♿ **Accessible** - Designed for all ages and abilities
-- 🚀 **Performance Optimized** - Throttled processing for smooth experience
+- 🎨 **Simple UI** - Clean interface with camera controls
+- 📷 **Camera Integration** - Front/back camera switching
+- 🔄 **Basic Feedback** - Shows detected gestures with confidence scores
+- ♿ **Accessible** - Designed for ease of use
 
 ## 🛠️ Technical Stack
 
 - **Frontend**: React Native 0.79.5
 - **Framework**: Expo SDK 53
 - **Camera**: expo-camera 16.1.10
-- **AI/ML**: MediaPipe Tasks Vision 0.10.3
+- **AI/ML**: Google MediaPipe Tasks Vision 0.10.3
 - **WebView**: react-native-webview 13.13.5
-- **Model Storage**: Supabase
-- **Architecture**: Modular component-based structure
+- **Model Storage**: Supabase (hosting the gesture model)
+- **Architecture**: Component-based structure
 
 ## 📁 Project Structure
 
@@ -85,54 +84,54 @@ Signademy/
 
 ## 📱 Usage
 
-1. **Launch the app** - Beautiful splash screen with Signademy branding
+1. **Launch the app** - Splash screen loads the application
 2. **Grant camera permission** - Required for gesture detection
 3. **Enable camera** - Use the camera toggle button
-4. **Start signing** - Make ASL gestures in front of the camera
-5. **View results** - Real-time detection with confidence scores
+4. **Start signing** - Make gestures in front of the camera
+5. **View results** - Detection happens every 500ms with confidence scores shown
 6. **Switch camera** - Use flip button to change between front/back camera
 
-## 🤖 AI Model
+## 🤖 How It Works
 
-Signademy uses a custom-trained ASL (American Sign Language) model:
+Signademy uses Google's MediaPipe Gesture Recognition framework:
 
-- **Training Data**: 14,000+ ASL gesture images
-- **Model Format**: MediaPipe Task format (.task)
-- **Hosting**: Supabase cloud storage
-- **Recognition**: Real-time gesture classification with confidence scores
-- **Performance**: Optimized for mobile devices with GPU acceleration
+- **Model**: Pre-trained gesture recognition model from Google MediaPipe
+- **Documentation**: Based on https://ai.google.dev/edge/mediapipe/solutions/customization/gesture_recognizer
+- **Detection Method**: Frame-by-frame capture (not real-time streaming)
+- **Capture Interval**: Takes a photo every 500ms for analysis
+- **Processing**: Each frame is sent to MediaPipe for gesture detection
+- **Results**: Displays detected gestures with confidence percentages
 
-## 🎨 Design Features
+**Note**: This is not real-time detection - the app captures frames at intervals for processing.
 
-- **Splash Screen**: Animated logo with feature highlights
-- **Loading States**: Professional loading overlays during AI model initialization
-- **Error Handling**: User-friendly error messages with retry functionality
-- **Responsive Design**: Adapts to different screen sizes
-- **Accessibility**: High contrast colors and clear typography
-- **Smooth Animations**: React Native Animated API for fluid transitions
+## 🎨 App Features
 
-## 🔧 Configuration
+- **Splash Screen**: Loading screen while app initializes
+- **Camera Controls**: Simple buttons to toggle camera on/off and flip between front/back
+- **Frame Capture**: Automatic photo capture every 500ms when camera is active
+- **Detection Display**: Shows gesture recognition results in a web view
+- **Error Handling**: Basic error messages for camera/model issues
+
+## 🔧 Technical Details
 
 ### Camera Settings
-- **Quality**: Optimized for performance (0.3 quality)
-- **Capture Interval**: 500ms for smooth detection
+- **Capture Quality**: 0.3 (optimized for processing speed)
+- **Capture Interval**: 500ms between frames
 - **Format**: JPEG with base64 encoding
-- **Features**: Front/back switching, permission management
+- **Features**: Front/back switching, permission handling
 
-### AI Processing
-- **Throttling**: 300ms minimum between AI processing
-- **GPU Acceleration**: Enabled for better performance
-- **Model Loading**: Automatic retry on failure
-- **Results Display**: Confidence threshold filtering
+### Detection Processing
+- **Method**: Frame-by-frame analysis (not real-time streaming)
+- **Interval**: New detection every 500ms minimum
+- **Model**: Google MediaPipe gesture recognition
+- **Results**: Confidence scores and gesture names displayed
 
-## 📊 Performance
+## 📊 Limitations
 
-- **Bundle Size**: ~7MB total
-- **Startup Time**: ~2-3 seconds
-- **AI Model Load**: ~3-5 seconds (network dependent)
-- **Frame Processing**: 500ms intervals
-- **AI Processing**: 300ms throttled
-- **Memory Usage**: Optimized for mobile devices
+- **Not Real-time**: Detection happens on captured frames, not live video stream
+- **Processing Delay**: 500ms intervals between captures for performance
+- **Model Dependency**: Requires internet connection to download MediaPipe model
+- **Basic Gestures**: Limited to gestures supported by Google's pre-trained model
 
 ## 🤝 Contributing
 
@@ -150,21 +149,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-**Signademy Team** - AI-powered education technology
+**Signademy Development Team**
 
 ## 🙏 Acknowledgments
 
-- MediaPipe team for the AI/ML framework
-- Expo team for the development platform
+- Google MediaPipe team for the gesture recognition framework
+- Expo team for the React Native development platform
 - React Native community for the mobile framework
-- ASL community for gesture recognition insights
 
 ## 📞 Support
 
-For support, please open an issue on GitHub or contact the development team.
+For support, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ for accessible education**
+**Simple gesture detection using Google MediaPipe**
 
-🤟 **Signademy** - Making sign language learning accessible to everyone through AI technology.
+🤟 **Signademy** - Frame-by-frame sign language gesture detection.
