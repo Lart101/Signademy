@@ -322,8 +322,8 @@ const NumbersLearningScreen = ({ onBack }) => {
           )}
         </View>
         
-        <View style={[styles.cameraContainer, !cameraEnabled && styles.cameraContainerDisabled]}>
-          {/* Camera Component */}
+        <View style={styles.cameraContainerHidden}>
+          {/* Camera Component - Hidden but functional for AI detection */}
           <CameraView
             cameraEnabled={cameraEnabled}
             hasPermission={permission?.granted}
@@ -518,6 +518,14 @@ const styles = {
     minHeight: 0,
     height: 0,
     backgroundColor: 'transparent',
+  },
+  cameraContainerHidden: {
+    position: 'absolute',
+    top: -1000,
+    left: -1000,
+    width: 1,
+    height: 1,
+    opacity: 0,
   },
   successOverlay: {
     position: 'absolute',

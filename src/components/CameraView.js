@@ -13,14 +13,16 @@ const CameraView = ({ cameraEnabled, hasPermission, cameraRef, onCameraReady, fa
   }
 
   return (
-    <ExpoCameraView
-      style={{ flex: 1, width: '100%', height: '100%' }}
-      facing={facing}
-      ref={cameraRef}
-      onCameraReady={onCameraReady}
-      animateShutter={false}
-      ratio="16:9"
-    />
+    <View style={{ position: 'absolute', top: -1000, left: -1000, width: 1, height: 1, opacity: 0 }}>
+      <ExpoCameraView
+        style={{ width: 1, height: 1 }}
+        facing={facing}
+        ref={cameraRef}
+        onCameraReady={onCameraReady}
+        animateShutter={false}
+        ratio="16:9"
+      />
+    </View>
   );
 };
 
