@@ -13,7 +13,53 @@ Signademy is a React Native mobile application that uses Google's MediaPipe fram
 - 🔄 **Basic Feedback** - Shows detected gestures with confidence scores
 - ♿ **Accessible** - Designed for ease of use
 
-## 🛠️ Technical Stack
+## � Download APK
+
+### Option 1: Download from Releases
+1. Go to [Releases](https://github.com/Lart101/Signademy/releases)
+2. Download the latest `signademy.apk` file
+3. Install on your Android device
+
+### Option 2: Build Your Own APK
+
+#### Prerequisites for Building
+- Node.js (18 or higher)
+- Expo account (free at expo.dev)
+- EAS CLI
+
+#### Local APK Build
+```bash
+# Clone the repository
+git clone https://github.com/Lart101/Signademy.git
+cd Signademy
+
+# Install dependencies
+npm install
+
+# Install Expo CLI and EAS CLI
+npm install -g @expo/cli eas-cli
+
+# Login to Expo (create account at expo.dev if needed)
+npx expo login
+
+# Build APK locally
+npx eas build --platform android --profile preview --local
+```
+
+#### GitHub Actions Build
+The repository includes automated APK builds via GitHub Actions:
+
+1. **Automatic builds** on every push to main branch
+2. **Manual builds** can be triggered from the Actions tab
+3. **Release builds** when you create a new tag
+
+To trigger a release build:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## �🛠️ Technical Stack
 
 - **Frontend**: React Native 0.79.5
 - **Framework**: Expo SDK 53
@@ -21,12 +67,13 @@ Signademy is a React Native mobile application that uses Google's MediaPipe fram
 - **AI/ML**: Google MediaPipe Tasks Vision 0.10.3
 - **WebView**: react-native-webview 13.13.5
 - **Model Storage**: Supabase (hosting the gesture model)
-- **Architecture**: Component-based structure
+- **Build System**: EAS Build (Expo Application Services)
 
 ## 📁 Project Structure
 
 ```
 Signademy/
+├── .github/workflows/       # GitHub Actions for APK builds
 ├── src/
 │   ├── components/          # Reusable UI components
 │   │   ├── SplashScreen.js  # Animated splash screen
@@ -42,6 +89,7 @@ Signademy/
 │   └── webview/             # WebView content
 │       └── MediaPipeHTML.js # HTML for MediaPipe integration
 ├── assets/                  # App icons and images
+├── eas.json                # EAS Build configuration
 ├── App.js                  # Main application component
 ├── package.json            # Dependencies and scripts
 └── app.json               # Expo configuration
@@ -49,14 +97,7 @@ Signademy/
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js (14 or higher)
-- npm or yarn
-- Expo CLI
-- iOS Simulator or Android Emulator (for testing)
-
-### Installation
+### For Development
 
 1. **Clone the repository**
    ```bash
@@ -80,7 +121,13 @@ Signademy/
    - Scan QR code with Expo Go app (mobile)
    - Press `a` for Android emulator
    - Press `i` for iOS simulator
-   - Press `w` for web browser
+
+### For Testing (APK)
+
+1. **Download APK** from [Releases](https://github.com/Lart101/Signademy/releases)
+2. **Enable unknown sources** in Android settings
+3. **Install the APK** on your Android device
+4. **Grant camera permission** when prompted
 
 ## 📱 Usage
 
@@ -126,12 +173,48 @@ Signademy uses Google's MediaPipe Gesture Recognition framework:
 - **Model**: Google MediaPipe gesture recognition
 - **Results**: Confidence scores and gesture names displayed
 
-## 📊 Limitations
+## � Building APK
+
+### Using GitHub Actions (Recommended)
+
+1. **Fork this repository**
+2. **Set up Expo secrets** in GitHub repository settings:
+   - Go to Settings → Secrets and Variables → Actions
+   - Add these secrets:
+     - `EXPO_USERNAME`: Your Expo account username
+     - `EXPO_PASSWORD`: Your Expo account password  
+     - `EXPO_TOKEN`: Your Expo access token (from expo.dev)
+
+3. **Trigger build**:
+   - Push to main branch (automatic)
+   - Create a new release tag: `git tag v1.0.0 && git push origin v1.0.0`
+   - Manually trigger from Actions tab
+
+4. **Download APK** from the Actions artifacts or Releases
+
+### Local Build Setup
+
+```bash
+# Install EAS CLI globally
+npm install -g eas-cli
+
+# Login to Expo
+eas login
+
+# Configure EAS project (if needed)
+eas build:configure
+
+# Build APK locally
+eas build --platform android --profile preview --local
+```
+
+## �📊 Limitations
 
 - **Not Real-time**: Detection happens on captured frames, not live video stream
 - **Processing Delay**: 500ms intervals between captures for performance
 - **Model Dependency**: Requires internet connection to download MediaPipe model
 - **Basic Gestures**: Limited to gestures supported by Google's pre-trained model
+- **Android Only**: APK builds are for Android devices only
 
 ## 🤝 Contributing
 
