@@ -322,7 +322,7 @@ const NumbersLearningScreen = ({ onBack }) => {
           )}
         </View>
         
-        <View style={styles.cameraContainer}>
+        <View style={[styles.cameraContainer, !cameraEnabled && styles.cameraContainerDisabled]}>
           {/* Camera Component */}
           <CameraView
             cameraEnabled={cameraEnabled}
@@ -512,6 +512,12 @@ const styles = {
     backgroundColor: '#000',
     position: 'relative',
     minHeight: 200,
+  },
+  cameraContainerDisabled: {
+    flex: 0,
+    minHeight: 0,
+    height: 0,
+    backgroundColor: 'transparent',
   },
   successOverlay: {
     position: 'absolute',

@@ -5,24 +5,11 @@ import { mainStyles } from '../styles/MainStyles';
 
 const CameraView = ({ cameraEnabled, hasPermission, cameraRef, onCameraReady, facing }) => {
   if (!hasPermission) {
-    return (
-      <View style={mainStyles.container}>
-        <Text style={mainStyles.permissionText}>
-          Camera permission is required for sign language detection
-        </Text>
-      </View>
-    );
+    return null; // Don't render anything - parent handles permission UI
   }
 
   if (!cameraEnabled) {
-    return (
-      <View style={mainStyles.disabledCameraContainer}>
-        <Text style={mainStyles.disabledCameraText}>Camera is disabled</Text>
-        <Text style={mainStyles.disabledCameraSubtext}>
-          Enable camera to start sign language detection
-        </Text>
-      </View>
-    );
+    return null; // Don't render anything - parent handles disabled state UI
   }
 
   return (
