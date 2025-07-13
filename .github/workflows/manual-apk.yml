@@ -47,6 +47,11 @@ jobs:
         fi
         npx expo login -u "${{ secrets.EXPO_USERNAME }}" -p "${{ secrets.EXPO_PASSWORD }}"
 
+    - name: Configure EAS Project
+      run: |
+        # Check if project exists, if not create it
+        npx eas project:info || npx eas project:create --non-interactive
+        
     - name: Verify project configuration
       run: |
         npx expo config
