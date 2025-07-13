@@ -31,8 +31,12 @@ export const useModelState = (modelPath = null) => {
         // Handle gesture detection for practice mode or other features
         console.log('Gesture detected:', message.gesture, 'Confidence:', message.confidence);
       }
+      
+      // Return the parsed message for further processing
+      return message;
     } catch (error) {
       console.log('WebView message:', event.nativeEvent.data);
+      return null;
     }
   };
 

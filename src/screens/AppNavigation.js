@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import HomeScreen from './HomeScreen';
 import LearningScreen from './LearningScreen';
 import PracticeScreen from './PracticeScreen';
+import LettersLearningScreen from './LettersLearningScreen';
 
 // Import existing components for fallback
 import SplashScreen from '../components/SplashScreen';
@@ -21,6 +22,10 @@ const AppNavigation = () => {
   const navigateToLearning = (category) => {
     setSelectedCategory(category);
     setCurrentScreen('learning');
+  };
+
+  const navigateToLettersLearning = () => {
+    setCurrentScreen('letters-learning');
   };
 
   const navigateToPractice = () => {
@@ -41,8 +46,12 @@ const AppNavigation = () => {
       // Show category selection in learning mode - for now just use letters
       navigateToLearning({ id: 'letters' });
     } else if (typeof categoryOrMode === 'object') {
-      // Direct category selection
-      navigateToLearning(categoryOrMode);
+      // Direct category selection - check if it's letters for special handling
+      if (categoryOrMode.id === 'letters') {
+        navigateToLettersLearning();
+      } else {
+        navigateToLearning(categoryOrMode);
+      }
     } else {
       // Handle other modes
       console.log('Selected:', categoryOrMode);
@@ -67,6 +76,13 @@ const AppNavigation = () => {
         return (
           <LearningScreen
             category={selectedCategory}
+            onBack={navigateToHome}
+          />
+        );
+      
+      case 'letters-learning':
+        return (
+          <LettersLearningScreen
             onBack={navigateToHome}
           />
         );

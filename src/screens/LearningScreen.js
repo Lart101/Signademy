@@ -13,11 +13,25 @@ import CameraView from '../components/CameraView';
 import DetectionWebView from '../components/DetectionWebView';
 import LoadingOverlay from '../components/LoadingOverlay';
 
+// Import specialized learning screens
+import LettersLearningScreen from './LettersLearningScreen';
+import NumbersLearningScreen from './NumbersLearningScreen';
+
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
 
 const LearningScreen = ({ category, onBack, onModelChange }) => {
+  // Route to specialized learning screens for Letters and Numbers
+  if (category.id === MODEL_CATEGORIES.LETTERS) {
+    return <LettersLearningScreen onBack={onBack} />;
+  }
+  
+  if (category.id === MODEL_CATEGORIES.NUMBERS) {
+    return <NumbersLearningScreen onBack={onBack} />;
+  }
+
+  // For other categories, use the generic learning screen
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [facing, setFacing] = useState('front');
   

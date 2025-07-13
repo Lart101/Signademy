@@ -87,8 +87,6 @@ export const webViewHTML = `
 </head>
 <body>
     <div class="container">
-        <h1>🤟 Signademy Detection</h1>
-        
         <div class="loading" id="loading">Initializing AI model...</div>
         
         <div class="frame-container">

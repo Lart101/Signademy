@@ -5,7 +5,14 @@
   "main": "index.js",
   "author": "Signademy Team",
   "license": "MIT",
-  "keywords": ["sign-language", "education", "ai", "react-native", "expo", "accessibility"],
+  "keywords": [
+    "sign-language",
+    "education",
+    "ai",
+    "react-native",
+    "expo",
+    "accessibility"
+  ],
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -14,10 +21,11 @@
   },
   "dependencies": {
     "expo": "~53.0.17",
+    "expo-av": "^15.1.0",
+    "expo-camera": "~16.1.10",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
     "react-native": "0.79.5",
-    "expo-camera": "~16.1.10",
     "react-native-webview": "13.13.5"
   },
   "devDependencies": {

@@ -26,10 +26,10 @@ export const MODEL_PATHS = {
   [MODEL_CATEGORIES.NUMBERS]: {
     url: "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage/numbers.task",
     localPath: "./assets/model/numbers.task", 
-    name: "Numbers (1-20)",
+    name: "Numbers (0-9)",
     description: "Learn numbers in sign language",
     icon: "🔢",
-    enabled: false, // Will be enabled when model is available
+    enabled: true, // Enabled - videos are available!
   },
   [MODEL_CATEGORIES.GREETINGS]: {
     url: "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage/greetings.task",
