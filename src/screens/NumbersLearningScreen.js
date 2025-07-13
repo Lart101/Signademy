@@ -509,7 +509,7 @@ const styles = {
     flex: 1,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#000',
+    backgroundColor: '#f0f0f0',
     position: 'relative',
     minHeight: 200,
   },
