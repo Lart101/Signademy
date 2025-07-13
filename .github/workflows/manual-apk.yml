@@ -45,7 +45,7 @@ jobs:
 
     - name: Build APK
       run: |
-        npx eas build --platform android --profile preview --local --output signademy-v1.0.0.apk
+        npx eas build --platform android --profile preview --local --output signademy-v1.0.0.apk --clear-cache
       env:
         EXPO_DEBUG: 1
 
