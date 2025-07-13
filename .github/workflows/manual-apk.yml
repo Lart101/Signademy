@@ -2,9 +2,6 @@ name: Manual APK Release
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 jobs:
   build-apk:
@@ -34,10 +31,9 @@ jobs:
 
     - name: Upload APK to Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
       with:
-        tag_name: ${{ github.ref_name != '' && github.ref_name || 'manual-build' }}
-        name: Signademy APK Release
+        tag_name: manual-build-${{ github.run_number }}
+        name: Signademy APK Manual Build
         files: signademy.apk
         body: |
           🤟 **Signademy APK Release**

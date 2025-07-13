@@ -2,7 +2,23 @@
 
 **Sign language gesture detection app using Google MediaPipe**
 
-Signademy is a React Native mobile application that uses Google's MediaPipe framework to detect sign language gestures through frame-by-frame camera capture.
+Signademy is a React Native mobile application that uses Google's MediaPipe framework## 🔧 Building APK
+
+### Using GitHub Actions (Manual Only)
+
+1. **Fork this repository**
+2. **Set up Expo secrets** in GitHub repository settings:
+   - Go to Settings → Secrets and Variables → Actions
+   - Add these secrets:
+     - `EXPO_USERNAME`: Your Expo account username
+     - `EXPO_PASSWORD`: Your Expo account password  
+     - `EXPO_TOKEN`: Your Expo access token (from expo.dev)
+
+3. **Trigger build manually**:
+   - Go to Actions tab → "Manual APK Release" → "Run workflow"
+   - Click "Run workflow" button
+
+4. **Download APK** from the Releases page after build completesnguage gestures through frame-by-frame camera capture.
 
 ## ✨ Features
 
@@ -47,17 +63,11 @@ npx eas build --platform android --profile preview --local
 ```
 
 #### GitHub Actions Build
-The repository includes automated APK builds via GitHub Actions:
+The repository includes manual APK builds via GitHub Actions:
 
-1. **Automatic builds** on every push to main branch
-2. **Manual builds** can be triggered from the Actions tab
-3. **Release builds** when you create a new tag
-
-To trigger a release build:
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+1. **Manual builds** can be triggered from the Actions tab
+2. Go to Actions → "Manual APK Release" → "Run workflow"
+3. APK will be available in Releases after build completes
 
 ## �🛠️ Technical Stack
 
@@ -73,7 +83,7 @@ git push origin v1.0.0
 
 ```
 Signademy/
-├── .github/workflows/       # GitHub Actions for APK builds
+├── .github/workflows/       # GitHub Actions for manual APK builds
 ├── src/
 │   ├── components/          # Reusable UI components
 │   │   ├── SplashScreen.js  # Animated splash screen
