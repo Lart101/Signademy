@@ -27,6 +27,8 @@ jobs:
       run: |
         npm ci
         npm audit --audit-level=high
+        # Install expo-dev-client for development builds
+        npm install expo-dev-client --save-dev
 
     - name: Install Expo CLI
       run: npm install -g @expo/cli eas-cli
@@ -49,8 +51,8 @@ jobs:
 
     - name: Initialize EAS Project
       run: |
-        # Initialize EAS project (this will create it if it doesn't exist)
-        npx eas init --non-interactive || echo "EAS project already initialized"
+        # Initialize EAS project and create if needed
+        npx eas init --id || npx eas project:init --non-interactive || echo "EAS project setup completed"
         
     - name: Verify project configuration
       run: |
