@@ -36,7 +36,16 @@ jobs:
         npx eas whoami || echo "Not logged in to EAS"
         
     - name: Expo Login
-      run: npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
+      run: |
+        if [ -z "${{ secrets.EXPO_USERNAME }}" ] || [ -z "${{ secrets.EXPO_PASSWORD }}" ]; then
+          echo "❌ EXPO_USERNAME or EXPO_PASSWORD secrets are not set!"
+          echo "Please add your Expo credentials to GitHub Secrets:"
+          echo "1. Go to Settings → Secrets and variables → Actions"
+          echo "2. Add EXPO_USERNAME with your Expo username"
+          echo "3. Add EXPO_PASSWORD with your Expo password"
+          exit 1
+        fi
+        npx expo login -u "${{ secrets.EXPO_USERNAME }}" -p "${{ secrets.EXPO_PASSWORD }}"
 
     - name: Verify project configuration
       run: |
