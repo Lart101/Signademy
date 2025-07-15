@@ -116,19 +116,20 @@ export const webViewHTML = `
         const placeholder = document.getElementById('placeholder');
 
         // Initialize the GestureRecognizer with dynamic model
-        const createGestureRecognizer = async (modelPath = null) => {
+        const createGestureRecognizer = async (modelPath) => {
             try {
+                if (!modelPath) {
+                    console.log('No model path provided, waiting...');
+                    return;
+                }
+                
                 const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
                 
-                // Use provided model path or default to letters model
-                const defaultModelPath = "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage//Asl14000imagePART3.task";
-                const modelAssetPath = modelPath || defaultModelPath;
-                
-                console.log('Loading model from:', modelAssetPath);
+                console.log('Loading model from:', modelPath);
                 
                 gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
                     baseOptions: {
-                        modelAssetPath: modelAssetPath,
+                        modelAssetPath: modelPath,
                         delegate: "GPU"
                     },
                     runningMode: "IMAGE"
@@ -142,7 +143,7 @@ export const webViewHTML = `
                 // Notify React Native that model is loaded
                 window.ReactNativeWebView?.postMessage(JSON.stringify({
                     type: 'model-loaded',
-                    modelPath: modelAssetPath
+                    modelPath: modelPath
                 }));
             } catch (error) {
                 console.error('Error loading custom model:', error);
@@ -153,7 +154,7 @@ export const webViewHTML = `
                 // Notify React Native about the error
                 window.ReactNativeWebView?.postMessage(JSON.stringify({
                     type: 'model-error',
-                    error: error.message
+                    error: 'Failed to fetch model: ' + modelPath + ' (' + (error.message || error) + ')'
                 }));
             }
         };
@@ -326,8 +327,10 @@ export const webViewHTML = `
             }
         });
 
-        // Initialize when page loads
-        createGestureRecognizer();
+        // Don't initialize automatically - wait for model path from React Native
+        console.log('WebView ready, waiting for model path...');
+        statusDiv.textContent = 'Waiting for model...';
+        statusDiv.className = 'status inactive';
     </script>
 </body>
 </html>

@@ -11,7 +11,7 @@ import { getEnabledCategories } from '../config/ModelConfig';
 
 const { width } = Dimensions.get('window');
 
-const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz }) => {
+const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownloads }) => {
   const enabledCategories = getEnabledCategories();
   const [activeTab, setActiveTab] = useState('home');
 
@@ -82,6 +82,14 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz }) => {
       >
         <Text style={[styles.navIcon, activeTab === 'practice' && styles.navIconActive]}>🎯</Text>
         <Text style={[styles.navText, activeTab === 'practice' && styles.navTextActive]}>Practice</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.navItem, activeTab === 'downloads' && styles.navItemActive]}
+        onPress={() => setActiveTab('downloads')}
+      >
+        <Text style={[styles.navIcon, activeTab === 'downloads' && styles.navIconActive]}>📦</Text>
+        <Text style={[styles.navText, activeTab === 'downloads' && styles.navTextActive]}>Downloads</Text>
       </TouchableOpacity>
     </View>
   );
@@ -184,6 +192,43 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz }) => {
                   <View style={styles.comingSoonItem}>
                     <Text style={styles.comingSoonIcon}>🍎</Text>
                     <Text style={styles.comingSoonText}>Food</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </>
+        );
+
+      case 'downloads':
+        return (
+          <>
+            <View style={styles.tabHeader}>
+              <Text style={styles.tabTitle}>📦 Downloads</Text>
+              <Text style={styles.tabSubtitle}>Manage offline models</Text>
+            </View>
+
+            <View style={styles.section}>
+              <MenuCard
+                title="Manage Models"
+                description="Download models for offline use"
+                icon="📦"
+                onPress={onOpenDownloads}
+              />
+              
+              <View style={styles.downloadInfo}>
+                <Text style={styles.downloadInfoTitle}>💡 Why Download Models?</Text>
+                <View style={styles.downloadFeatures}>
+                  <View style={styles.featureItem}>
+                    <Text style={styles.featureIcon}>⚡</Text>
+                    <Text style={styles.featureText}>Faster loading</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <Text style={styles.featureIcon}>📱</Text>
+                    <Text style={styles.featureText}>Works offline</Text>
+                  </View>
+                  <View style={styles.featureItem}>
+                    <Text style={styles.featureIcon}>🔒</Text>
+                    <Text style={styles.featureText}>Secure storage</Text>
                   </View>
                 </View>
               </View>
@@ -459,6 +504,29 @@ const styles = {
     fontSize: 12,
     color: '#e67e22',
     fontWeight: '600',
+  },
+  // Download Info Styles
+  downloadInfo: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  downloadInfoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3498db',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  downloadFeatures: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
   },
   // Bottom Navigation Styles
   bottomNavigation: {

@@ -18,6 +18,7 @@ import LetterVideo from '../components/LetterVideo'; // Reuse for numbers
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useAsyncModelPath } from '../hooks/useAsyncModelPath';
 import { useFeedbackSounds, useUISounds } from '../hooks/useSoundEffects';
 import { getModelInfo, MODEL_CATEGORIES } from '../config/ModelConfig';
 
@@ -45,11 +46,12 @@ const NumbersLearningScreen = ({ onBack }) => {
   
   // Get model info for numbers
   const modelInfo = getModelInfo(MODEL_CATEGORIES.NUMBERS);
+  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(MODEL_CATEGORIES.NUMBERS);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
-  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelPath);
   
   // Sound effects hooks
   const { playCorrect, playIncorrect, playSuccess, playCompletion } = useFeedbackSounds();
@@ -350,12 +352,12 @@ const NumbersLearningScreen = ({ onBack }) => {
       <DetectionWebView
         onMessage={enhancedMessageHandler}
         webViewRef={webviewRef}
-        modelPath={modelInfo?.url}
+        modelPath={modelPath}
       />
 
       {/* Loading Overlay */}
       <LoadingOverlay
-        modelLoaded={modelLoaded}
+        modelLoaded={modelLoaded && !modelPathLoading}
         modelError={modelError}
         onRetry={retryModel}
         modelName="Numbers Recognition Model"

@@ -6,6 +6,7 @@ import HomeScreen from './HomeScreen';
 import LearningScreen from './LearningScreen';
 import PracticeScreen from './PracticeScreen';
 import LettersLearningScreen from './LettersLearningScreen';
+import ModelDownloadScreen from './ModelDownloadScreen';
 
 // Import existing components for fallback
 import SplashScreen from '../components/SplashScreen';
@@ -35,6 +36,10 @@ const AppNavigation = () => {
   const navigateToQuiz = () => {
     // Coming soon - for now just show an alert or stay on home
     console.log('Quiz coming soon!');
+  };
+
+  const navigateToDownloads = () => {
+    setCurrentScreen('downloads');
   };
 
   const handleSplashFinish = () => {
@@ -69,6 +74,7 @@ const AppNavigation = () => {
             onSelectCategory={handleSelectCategory}
             onStartPractice={navigateToPractice}
             onTakeQuiz={navigateToQuiz}
+            onOpenDownloads={navigateToDownloads}
           />
         );
       
@@ -90,6 +96,13 @@ const AppNavigation = () => {
       case 'practice':
         return (
           <PracticeScreen
+            onBack={navigateToHome}
+          />
+        );
+      
+      case 'downloads':
+        return (
+          <ModelDownloadScreen
             onBack={navigateToHome}
           />
         );

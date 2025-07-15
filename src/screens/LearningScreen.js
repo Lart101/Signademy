@@ -20,6 +20,7 @@ import NumbersLearningScreen from './NumbersLearningScreen';
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useAsyncModelPath } from '../hooks/useAsyncModelPath';
 
 const LearningScreen = ({ category, onBack, onModelChange }) => {
   // Route to specialized learning screens for Letters and Numbers
@@ -40,11 +41,12 @@ const LearningScreen = ({ category, onBack, onModelChange }) => {
   
   // Get model info for the selected category
   const modelInfo = getModelInfo(category.id);
+  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(category.id);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
-  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelPath);
 
   // Event handlers
   const toggleCamera = async () => {
@@ -118,12 +120,12 @@ const LearningScreen = ({ category, onBack, onModelChange }) => {
         <DetectionWebView
           onMessage={handleWebViewMessage}
           webViewRef={webviewRef}
-          modelPath={modelInfo.url} // Pass the specific model path
+          modelPath={modelPath} // Use the async model path
         />
 
         {/* Loading Overlay */}
         <LoadingOverlay
-          modelLoaded={modelLoaded}
+          modelLoaded={modelLoaded && !modelPathLoading}
           modelError={modelError}
           onRetry={retryModel}
           modelName={modelInfo.name}

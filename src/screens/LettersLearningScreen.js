@@ -18,6 +18,7 @@ import LetterVideo from '../components/LetterVideo';
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useAsyncModelPath } from '../hooks/useAsyncModelPath';
 import { useFeedbackSounds, useUISounds } from '../hooks/useSoundEffects';
 import { getModelInfo, MODEL_CATEGORIES } from '../config/ModelConfig';
 
@@ -45,11 +46,12 @@ const LettersLearningScreen = ({ onBack }) => {
   
   // Get model info
   const modelInfo = getModelInfo(MODEL_CATEGORIES.LETTERS);
+  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(MODEL_CATEGORIES.LETTERS);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
-  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelPath);
   
   // Sound effects hooks
   const { playCorrect, playIncorrect, playSuccess, playCompletion } = useFeedbackSounds();
@@ -347,12 +349,12 @@ const LettersLearningScreen = ({ onBack }) => {
       <DetectionWebView
         onMessage={enhancedMessageHandler}
         webViewRef={webviewRef}
-        modelPath={modelInfo?.url}
+        modelPath={modelPath}
       />
 
       {/* Loading Overlay */}
       <LoadingOverlay
-        modelLoaded={modelLoaded}
+        modelLoaded={modelLoaded && !modelPathLoading}
         modelError={modelError}
         onRetry={retryModel}
         modelName="Letters Recognition Model"

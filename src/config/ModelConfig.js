@@ -16,7 +16,7 @@ export const MODEL_CATEGORIES = {
 
 export const MODEL_PATHS = {
   [MODEL_CATEGORIES.LETTERS]: {
-    url: "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage//Asl14000imagePART3.task",
+    url: "https://rgxalrnmnlbmskupyhcm.supabase.co/storage/v1/object/public/signlanguage/letters.task",
     localPath: "./assets/model/letters.task",
     name: "Letters (A-Z)",
     description: "Learn the alphabet in sign language",
@@ -99,14 +99,35 @@ export const getEnabledCategories = () => {
 };
 
 /**
- * Get model path for a specific category
+ * Get model path for a specific category (sync version)
  */
 export const getModelPath = (category) => {
   const model = MODEL_PATHS[category];
   if (!model) {
     throw new Error(`Model category '${category}' not found`);
   }
-  return model.url; // Prefer cloud URL over local path
+  return model.url; // Remote URL for sync usage
+};
+
+/**
+ * Get model path for a specific category (async version that checks for local downloads)
+ * This function will prefer local downloaded models over remote URLs
+ */
+export const getModelPathAsync = async (category) => {
+  const model = MODEL_PATHS[category];
+  if (!model) {
+    throw new Error(`Model category '${category}' not found`);
+  }
+  
+  // Try to get local path first (if ModelManager is available)
+  try {
+    const ModelManagerModule = await import('../utils/ModelManager');
+    const ModelManager = ModelManagerModule.default;
+    return await ModelManager.getModelPath(category);
+  } catch (error) {
+    console.log('ModelManager not available, using remote URL:', error);
+    return model.url; // Fallback to remote URL
+  }
 };
 
 /**

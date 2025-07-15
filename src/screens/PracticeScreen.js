@@ -17,6 +17,7 @@ import LoadingOverlay from '../components/LoadingOverlay';
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
 import { useModelState } from '../hooks/useModelState';
+import { useAsyncModelPath } from '../hooks/useAsyncModelPath';
 
 const PracticeScreen = ({ onBack }) => {
   const [currentCategory, setCurrentCategory] = useState(MODEL_CATEGORIES.LETTERS);
@@ -35,11 +36,12 @@ const PracticeScreen = ({ onBack }) => {
   // Get available categories
   const enabledCategories = getEnabledCategories();
   const modelInfo = getModelInfo(currentCategory);
+  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(currentCategory);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
   const { cameraRef } = useCameraCapture(cameraEnabled, webviewRef);
-  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelInfo?.url);
+  const { modelLoaded, modelError, handleWebViewMessage, retryModel } = useModelState(modelPath);
 
   // Generate random challenge based on category
   const generateChallenge = () => {
@@ -190,12 +192,12 @@ const PracticeScreen = ({ onBack }) => {
         <DetectionWebView
           onMessage={enhancedMessageHandler}
           webViewRef={webviewRef}
-          modelPath={modelInfo?.url}
+          modelPath={modelPath}
         />
 
         {/* Loading Overlay */}
         <LoadingOverlay
-          modelLoaded={modelLoaded}
+          modelLoaded={modelLoaded && !modelPathLoading}
           modelError={modelError}
           onRetry={retryModel}
           modelName={modelInfo?.name}
