@@ -34,7 +34,29 @@ export class ModelManager {
 
   static async isModelDownloaded(category) {
     const downloadedModels = await this.getDownloadedModels();
-    return downloadedModels[category] && downloadedModels[category].downloaded;
+    const entry = downloadedModels[category];
+    const localPath = this.getLocalModelPath(category);
+    const fileInfo = await FileSystem.getInfoAsync(localPath);
+    if (entry && entry.downloaded) {
+      if (fileInfo.exists && fileInfo.size > 10000) {
+        console.log(`[isModelDownloaded] TRUE: Storage entry exists, file exists (${fileInfo.size} bytes), category=${category}`);
+        return true;
+      } else {
+        console.warn(`[isModelDownloaded] FALSE: Storage entry exists but file missing or too small (exists=${fileInfo.exists}, size=${fileInfo.size}), cleaning up, category=${category}`);
+        delete downloadedModels[category];
+        await this.setDownloadedModels(downloadedModels);
+        return false;
+      }
+    } else {
+      if (fileInfo.exists) {
+        console.warn(`[isModelDownloaded] FALSE: No storage entry but file exists (${fileInfo.size} bytes), cleaning up file, category=${category}`);
+        await FileSystem.deleteAsync(localPath);
+      } else {
+        console.log(`[isModelDownloaded] FALSE: No storage entry and no file, category=${category}`);
+      }
+      return false;
+    }
+
   }
 
   static getLocalModelPath(category) {
@@ -191,32 +213,26 @@ export class ModelManager {
     if (!modelConfig) {
       throw new Error(`Model category '${category}' not found`);
     }
-    
     const isDownloaded = await this.isModelDownloaded(category);
-    
     if (isDownloaded) {
       const localPath = this.getLocalModelPath(category);
       const fileInfo = await FileSystem.getInfoAsync(localPath);
-      
-      if (fileInfo.exists && fileInfo.size > 10000) { // Ensure file is substantial
-        console.log(`✓ Using local model for ${category}: ${localPath} (${this.formatFileSize(fileInfo.size)})`);
+      console.log(`[ModelManager] Using local model for ${category}: ${localPath} (${fileInfo.size} bytes)`);
+      if (fileInfo.exists && fileInfo.size > 10000) {
         return { path: localPath, isLocal: true };
       } else {
         // File was deleted, corrupted, or too small - clean up storage
-        console.warn(`⚠️ Local file missing/corrupted for ${category}, cleaning up`);
+        console.warn(`[ModelManager] Local file missing/corrupted for ${category}, cleaning up`);
         const downloadedModels = await this.getDownloadedModels();
         delete downloadedModels[category];
         await this.setDownloadedModels(downloadedModels);
-        
-        // Delete the bad file
         if (fileInfo.exists) {
           await FileSystem.deleteAsync(localPath);
         }
       }
     }
-    
     // If no local model available, force user to download
-    console.log(`❌ No local model for ${category} - download required for offline use`);
+    console.log(`[ModelManager] No local model for ${category} - download required for offline use`);
     throw new Error(`Model '${category}' not downloaded. Please download it from the model manager for offline use.`);
   }
 
@@ -324,6 +340,9 @@ export class ModelManager {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
+
+
+  // clearAllModels now serves as the single method to delete all model files and storage
 }
 
 export default ModelManager;

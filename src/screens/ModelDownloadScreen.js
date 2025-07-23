@@ -99,6 +99,8 @@ const ModelDownloadScreen = ({ onBack }) => {
     );
   };
 
+  // Removed handleClearCache and force clear logic for simplicity
+
   const handleClearAll = async () => {
     if (downloadInfo.totalModels === 0) {
       Alert.alert('No Models', 'No downloaded models to clear.');
@@ -154,7 +156,7 @@ const ModelDownloadScreen = ({ onBack }) => {
                 style={styles.deleteButton}
                 onPress={() => handleDelete(category.id)}
               >
-                <Text style={styles.deleteButtonText}>Delete</Text>
+                <Text style={styles.deleteButtonText}>Remove from Device</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -165,7 +167,7 @@ const ModelDownloadScreen = ({ onBack }) => {
                 {isDownloading ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
-                  <Text style={styles.downloadButtonText}>Download</Text>
+                  <Text style={styles.downloadButtonText}>Download for Offline Use</Text>
                 )}
               </TouchableOpacity>
             )}
@@ -184,7 +186,7 @@ const ModelDownloadScreen = ({ onBack }) => {
         <View style={styles.statusContainer}>
           <View style={[styles.statusIndicator, isDownloaded ? styles.statusOnline : styles.statusOffline]} />
           <Text style={styles.statusText}>
-            {isDownloaded ? 'Available Offline' : 'Requires Internet'}
+            {isDownloaded ? 'Available Offline – You can use this model without internet.' : 'Requires Internet – Download to use offline.'}
           </Text>
         </View>
       </View>
@@ -220,7 +222,7 @@ const ModelDownloadScreen = ({ onBack }) => {
           </View>
           {downloadInfo.totalModels > 0 && (
             <TouchableOpacity style={styles.clearButton} onPress={handleClearAll}>
-              <Text style={styles.clearButtonText}>Clear All Models</Text>
+              <Text style={styles.clearButtonText}>Free Up Space (Remove All Models)</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -236,7 +238,7 @@ const ModelDownloadScreen = ({ onBack }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Available Models</Text>
           <Text style={styles.sectionDescription}>
-            Download models to use Signademy offline. Each model enables recognition for its category.
+            Download models to use Signademy offline. Each model enables recognition for its category. Tap "Download for Offline Use" to save a model to your device. Tap "Remove from Device" to free up space.
           </Text>
           
           {availableCategories.map((category) => (
