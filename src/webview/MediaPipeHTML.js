@@ -127,34 +127,57 @@ export const webViewHTML = `
                 
                 console.log('Loading model from:', modelPath);
                 
+                // Check if this is a local file path or remote URL
+                const isLocalFile = modelPath.startsWith('file://') || modelPath.includes('/models/');
+                
+                let modelAssetPath = modelPath;
+                
+                // For local files, we need to ensure proper handling
+                if (isLocalFile) {
+                    console.log('Using local model file:', modelPath);
+                    // Convert to proper file URI if needed
+                    if (!modelPath.startsWith('file://')) {
+                        modelAssetPath = 'file://' + modelPath;
+                    }
+                    console.log('Local model path prepared:', modelAssetPath);
+                } else {
+                    console.log('Using remote model URL:', modelPath);
+                    // For remote URLs, add offline prevention check
+                    if (!navigator.onLine) {
+                        throw new Error('No internet connection available for remote model');
+                    }
+                }
+                
                 gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
                     baseOptions: {
-                        modelAssetPath: modelPath,
+                        modelAssetPath: modelAssetPath,
                         delegate: "GPU"
                     },
                     runningMode: "IMAGE"
                 });
                 
                 loadingDiv.style.display = 'none';
-                statusDiv.textContent = 'Signademy Ready - Start signing!';
+                statusDiv.textContent = isLocalFile ? 'Offline Model Ready!' : 'Online Model Ready!';
                 statusDiv.className = 'status active';
-                console.log('Custom ASL model initialized successfully');
+                console.log(\`\${isLocalFile ? 'Local' : 'Remote'} ASL model initialized successfully\`);
                 
                 // Notify React Native that model is loaded
                 window.ReactNativeWebView?.postMessage(JSON.stringify({
                     type: 'model-loaded',
-                    modelPath: modelPath
+                    modelPath: modelPath,
+                    isLocal: isLocalFile
                 }));
             } catch (error) {
-                console.error('Error loading custom model:', error);
-                loadingDiv.textContent = 'Error loading AI model - Check connection';
-                statusDiv.textContent = 'Model loading failed - check network connection';
+                console.error('Error loading model:', error);
+                loadingDiv.textContent = 'Error loading AI model';
+                statusDiv.textContent = \`Model loading failed: \${error.message}\`;
                 statusDiv.className = 'status inactive';
                 
                 // Notify React Native about the error
                 window.ReactNativeWebView?.postMessage(JSON.stringify({
                     type: 'model-error',
-                    error: 'Failed to fetch model: ' + modelPath + ' (' + (error.message || error) + ')'
+                    error: 'Failed to load model: ' + modelPath + ' (' + (error.message || error) + ')',
+                    modelPath: modelPath
                 }));
             }
         };

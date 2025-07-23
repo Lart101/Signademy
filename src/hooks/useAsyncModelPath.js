@@ -29,7 +29,13 @@ export const useAsyncModelPath = (category) => {
         console.error('Error loading model path:', err);
         
         if (isMounted) {
-          setError(err.message);
+          // Check if this is a "download required" error
+          const isDownloadRequired = err.message.includes('download') || err.message.includes('Download');
+          setError({
+            message: err.message,
+            isDownloadRequired,
+            category
+          });
           setLoading(false);
         }
       }

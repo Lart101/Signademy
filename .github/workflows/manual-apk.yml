@@ -104,12 +104,14 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: v1.0.0-build-${{ github.run_number }}
-        name: Signademy v1.0.0 - Complete Learning App Release
+        name: Signademy v1.0.0 - Offline-First AI Learning App
         files: signademy-v1.0.0.apk
         body: |
-          🤟 **Signademy - AI-Powered Sign Language Learning App**
+          🤟 **Signademy - Offline-First AI Sign Language Learning App**
           
           ${{ github.event.inputs.release_notes }}
+          
+          📱 **New in this release: Complete offline functionality!** Download AI models once and learn sign language anywhere without internet connection.
           
           Download and install the APK file to test Signademy on your Android device.
           
@@ -117,38 +119,50 @@ jobs:
           - **Complete A-Z Letters Learning** with video demonstrations
           - **Numbers (0-9) Learning Module** with gesture detection
           - **Real-time AI Gesture Recognition** using Google MediaPipe
+          - **Offline-First Model System** - Download models for offline use
+          - **Enhanced Back Navigation** - Hardware & software back button support
+          - **Professional UI Design** with polished interfaces
           - **Sound Effects System** with feedback sounds
           - **Progress Tracking** with completion celebrations
           - **Camera Controls** with enable/disable and flip functionality
-          - **Optimized UI** with space-efficient layout
+          - **Model Download Manager** with validation and corruption detection
           
           **📱 Technical Features:**
           - React Native with Expo framework
           - AI-powered gesture detection (91%+ accuracy)
           - 36 instructional videos (A-Z + 0-9)
+          - Offline-first AI model system with local storage
+          - Comprehensive model validation and error handling
+          - Hardware back button integration with navigation stack
+          - Professional error screens with clear user guidance
           - Comprehensive sound feedback system
-          - Mobile-optimized interface
+          - Mobile-optimized interface with responsive design
           
           **📋 Requirements:**
           - Android 7.0+ (API level 24+)
           - Camera permission for gesture detection
-          - Microphone permission for sound effects
-          - Internet connection for initial model download
-          - ~50MB storage space
+          - Storage permission for model downloads
+          - Internet connection for initial model downloads only
+          - ~150MB storage space (including AI models)
+          - Device with sufficient processing power for AI recognition
           
           **🚀 Installation:**
           1. Download the APK file below
           2. Enable "Install from unknown sources" in Android settings
           3. Install the APK
-          4. Grant camera permissions when prompted
-          5. Start learning sign language!
+          4. Grant camera and storage permissions when prompted
+          5. Download AI models from the Model Manager
+          6. Start learning sign language offline!
           
           **📖 Usage:**
+          - **First Time Setup**: Download AI models from Model Manager
           - Choose Letters (A-Z) or Numbers (0-9) learning
           - Watch the video demonstration
           - Enable camera and practice the sign
           - Get real-time feedback when you sign correctly
           - Progress through all lessons with sound feedback
+          - **Navigation**: Use back button or hardware back key to navigate
+          - **Offline Learning**: Once models are downloaded, use without internet
           
           ---
           **Build Info:**

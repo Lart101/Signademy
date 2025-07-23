@@ -41,6 +41,9 @@ const DetectionWebView = ({ onMessage, webViewRef, modelPath }) => {
       allowsInlineMediaPlayback={true}
       mediaPlaybackRequiresUserAction={false}
       originWhitelist={['*']}
+      allowFileAccess={true}
+      allowFileAccessFromFileURLs={true}
+      allowUniversalAccessFromFileURLs={true}
       mixedContentMode="compatibility"
       onError={(syntheticEvent) => {
         const { nativeEvent } = syntheticEvent;

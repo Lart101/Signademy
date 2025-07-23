@@ -8,12 +8,40 @@ import {
   SafeAreaView
 } from 'react-native';
 import { getEnabledCategories } from '../config/ModelConfig';
+import { useModelRequiredModal, useModelAvailability } from '../hooks/useModelRequiredModal';
+import ModelStatusBadge from '../components/ModelStatusBadge';
 
 const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownloads }) => {
   const enabledCategories = getEnabledCategories();
   const [activeTab, setActiveTab] = useState('home');
+  
+  // Initialize model required modal hook
+  const { 
+    checkAndShowModal, 
+    ModelRequiredModalComponent 
+  } = useModelRequiredModal(onOpenDownloads);
+  
+  // Initialize model availability hook
+  const { isModelAvailable } = useModelAvailability();
+
+  // Enhanced category selection with model checking
+  const handleCategorySelect = (category) => {
+    const modelAvailable = checkAndShowModal(category.id, `${category.name} Learning`);
+    if (modelAvailable) {
+      onSelectCategory(category);
+    }
+  };
+
+  // Enhanced practice start with model checking
+  const handlePracticeStart = () => {
+    // For practice, we need at least one model (let's check letters first)
+    const modelAvailable = checkAndShowModal('letters', 'Practice Mode');
+    if (modelAvailable) {
+      onStartPractice();
+    }
+  };
 
   const MenuCard = ({ title, description, icon, onPress, disabled = false }) => (
     <TouchableOpacity 
@@ -44,19 +72,31 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownl
     </TouchableOpacity>
   );
 
-  const CategoryCard = ({ category, onPress }) => (
-    <TouchableOpacity 
-      style={styles.categoryCard}
-      onPress={() => onPress(category)}
-      activeOpacity={0.8}
-    >
-      <View style={styles.categoryHeader}>
-        <Text style={styles.categoryIcon}>{category.icon}</Text>
-        <Text style={styles.categoryTitle}>{category.name}</Text>
-      </View>
-      <Text style={styles.categoryDescription}>{category.description}</Text>
-    </TouchableOpacity>
-  );
+  const CategoryCard = ({ category, onPress }) => {
+    const modelAvailable = isModelAvailable(category.id);
+    
+    return (
+      <TouchableOpacity 
+        style={styles.categoryCard}
+        onPress={() => onPress(category)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.categoryHeader}>
+          <Text style={styles.categoryIcon}>{category.icon}</Text>
+          <View style={styles.categoryTitleContainer}>
+            <Text style={styles.categoryTitle}>{category.name}</Text>
+            <ModelStatusBadge 
+              isDownloaded={modelAvailable}
+              modelName={category.name}
+              size="small"
+              showText={false}
+            />
+          </View>
+        </View>
+        <Text style={styles.categoryDescription}>{category.description}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const BottomNavigation = () => (
     <View style={styles.bottomNavigation}>
@@ -169,7 +209,7 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownl
                 <CategoryCard
                   key={category.id}
                   category={category}
-                  onPress={onSelectCategory}
+                  onPress={handleCategorySelect}
                 />
               ))}
               
@@ -249,7 +289,7 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownl
                 title="Quick Practice"
                 description="Random letters practice"
                 icon="⚡"
-                onPress={onStartPractice}
+                onPress={handlePracticeStart}
               />
               
               <MenuCard
@@ -282,6 +322,7 @@ const HomeScreen = ({ onSelectCategory, onStartPractice, onTakeQuiz, onOpenDownl
         {renderTabContent()}
       </ScrollView>
       <BottomNavigation />
+      <ModelRequiredModalComponent />
     </SafeAreaView>
   );
 };
@@ -454,6 +495,11 @@ const styles = {
   categoryIcon: {
     fontSize: 24,
     marginRight: 12,
+  },
+  categoryTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 0,
   },
   categoryTitle: {
     fontSize: 16,

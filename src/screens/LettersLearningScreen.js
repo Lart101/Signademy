@@ -14,6 +14,7 @@ import CameraView from '../components/CameraView';
 import DetectionWebView from '../components/DetectionWebView';
 import LoadingOverlay from '../components/LoadingOverlay';
 import LetterVideo from '../components/LetterVideo';
+import ModelStatusIndicator from '../components/ModelStatusIndicator';
 
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
@@ -46,7 +47,7 @@ const LettersLearningScreen = ({ onBack }) => {
   
   // Get model info
   const modelInfo = getModelInfo(MODEL_CATEGORIES.LETTERS);
-  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(MODEL_CATEGORIES.LETTERS);
+  const { modelPath, loading: modelPathLoading, error: modelPathError } = useAsyncModelPath(MODEL_CATEGORIES.LETTERS);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
@@ -172,6 +173,38 @@ const LettersLearningScreen = ({ onBack }) => {
 
   // Calculate progress percentage
   const progressPercentage = ((currentLetterIndex + (completedLetters.includes(currentLetter) ? 1 : 0)) / letters.length) * 100;
+
+  // Handle model download navigation
+  const handleModelDownload = (category) => {
+    // Navigate to model download screen - this would typically be handled by navigation
+    Alert.alert(
+      'Download Required',
+      'You need to download the model to use this feature offline. Would you like to go to the download screen?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Download',
+          onPress: () => {
+            // This should navigate to ModelDownloadScreen
+            // For now, we'll show an alert
+            Alert.alert('Navigation', 'This would navigate to the model download screen.');
+          }
+        }
+      ]
+    );
+  };
+
+  // Show model status indicator if there's an error loading the model
+  if (modelPathError) {
+    return (
+      <ModelStatusIndicator 
+        error={modelPathError}
+        onDownloadPress={handleModelDownload}
+        onBack={onBack}
+        category={MODEL_CATEGORIES.LETTERS}
+      />
+    );
+  }
 
   // Completion Screen
   if (showCompletion) {

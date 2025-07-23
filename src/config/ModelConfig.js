@@ -110,8 +110,8 @@ export const getModelPath = (category) => {
 };
 
 /**
- * Get model path for a specific category (async version that checks for local downloads)
- * This function will prefer local downloaded models over remote URLs
+ * Get model path for a specific category (async version that prioritizes local downloads)
+ * This function will ONLY use local downloaded models to ensure offline functionality
  */
 export const getModelPathAsync = async (category) => {
   const model = MODEL_PATHS[category];
@@ -119,14 +119,33 @@ export const getModelPathAsync = async (category) => {
     throw new Error(`Model category '${category}' not found`);
   }
   
-  // Try to get local path first (if ModelManager is available)
+  // Try to get local path first (MANDATORY for offline use)
   try {
     const ModelManagerModule = await import('../utils/ModelManager');
     const ModelManager = ModelManagerModule.default;
-    return await ModelManager.getModelPath(category);
+    
+    // Use offline-first approach - will throw error if no local model
+    const result = await ModelManager.getModelPathWithOfflineCheck(category);
+    return result.path;
   } catch (error) {
-    console.log('ModelManager not available, using remote URL:', error);
-    return model.url; // Fallback to remote URL
+    console.error('Local model not available:', error.message);
+    
+    // NO FALLBACK - Force user to download models
+    throw new Error(`Model Download Required: ${model.name} model is not downloaded. Please download it to use this feature offline.`);
+  }
+};
+
+/**
+ * Get model path with fallback to online (use with caution - for emergency only)
+ * This should only be used in development or as a last resort
+ */
+export const getModelPathWithFallback = async (category) => {
+  try {
+    return await getModelPathAsync(category);
+  } catch (error) {
+    console.warn('⚠️ FALLBACK TO ONLINE MODEL - This requires internet connection!');
+    const model = MODEL_PATHS[category];
+    return model?.url;
   }
 };
 

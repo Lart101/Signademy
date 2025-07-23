@@ -14,6 +14,7 @@ import CameraView from '../components/CameraView';
 import DetectionWebView from '../components/DetectionWebView';
 import LoadingOverlay from '../components/LoadingOverlay';
 import LetterVideo from '../components/LetterVideo'; // Reuse for numbers
+import ModelStatusIndicator from '../components/ModelStatusIndicator';
 
 // Import hooks
 import { useCameraPermissions, useCameraCapture } from '../hooks/useCameraHooks';
@@ -46,7 +47,7 @@ const NumbersLearningScreen = ({ onBack }) => {
   
   // Get model info for numbers
   const modelInfo = getModelInfo(MODEL_CATEGORIES.NUMBERS);
-  const { modelPath, loading: modelPathLoading } = useAsyncModelPath(MODEL_CATEGORIES.NUMBERS);
+  const { modelPath, loading: modelPathLoading, error: modelPathError } = useAsyncModelPath(MODEL_CATEGORIES.NUMBERS);
   
   // Custom hooks
   const { permission, requestPermission } = useCameraPermissions();
@@ -172,6 +173,35 @@ const NumbersLearningScreen = ({ onBack }) => {
 
   // Calculate progress percentage
   const progressPercentage = ((currentNumberIndex + (completedNumbers.includes(currentNumber) ? 1 : 0)) / numbers.length) * 100;
+
+  // Handle model download navigation
+  const handleModelDownload = (category) => {
+    Alert.alert(
+      'Download Required',
+      'You need to download the model to use this feature offline. Would you like to go to the download screen?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Download',
+          onPress: () => {
+            Alert.alert('Navigation', 'This would navigate to the model download screen.');
+          }
+        }
+      ]
+    );
+  };
+
+  // Show model status indicator if there's an error loading the model
+  if (modelPathError) {
+    return (
+      <ModelStatusIndicator 
+        error={modelPathError}
+        onDownloadPress={handleModelDownload}
+        onBack={onBack}
+        category={MODEL_CATEGORIES.NUMBERS}
+      />
+    );
+  }
 
   // Completion Screen
   if (showCompletion) {

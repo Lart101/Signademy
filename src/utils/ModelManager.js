@@ -89,8 +89,24 @@ export class ModelManager {
           throw new Error('Downloaded file is empty. The model may not exist at the specified URL.');
         }
         
-        if (actualSize < 1000) { // Less than 1KB might be an error page
+        if (actualSize < 10000) { // Less than 10KB is definitely too small for a model
           console.warn(`Downloaded file seems very small (${actualSize} bytes). This might be an error page.`);
+          // Delete the suspicious file
+          if (fileInfo.exists) {
+            await FileSystem.deleteAsync(localPath);
+          }
+          throw new Error('Downloaded file is too small to be a valid model file.');
+        }
+        
+        // Validate the downloaded model
+        const validation = await this.validateModel(category);
+        if (!validation.valid) {
+          console.error(`Model validation failed: ${validation.reason}`);
+          // Delete invalid file
+          if (fileInfo.exists) {
+            await FileSystem.deleteAsync(localPath);
+          }
+          throw new Error(`Downloaded model is invalid: ${validation.reason}`);
         }
         
         // Mark as downloaded in storage
@@ -139,32 +155,104 @@ export class ModelManager {
     }
   }
 
-  static async getModelPath(category) {
+  static async validateModel(category) {
+    try {
+      const localPath = this.getLocalModelPath(category);
+      const fileInfo = await FileSystem.getInfoAsync(localPath);
+      
+      if (!fileInfo.exists) {
+        return { valid: false, reason: 'File does not exist' };
+      }
+      
+      if (fileInfo.size < 1000) {
+        return { valid: false, reason: 'File too small (likely corrupted)' };
+      }
+      
+      // Basic file format check - .task files should have specific headers
+      try {
+        const uri = localPath;
+        // Simple validation that the file can be accessed
+        const response = await fetch('file://' + uri);
+        if (!response.ok) {
+          return { valid: false, reason: 'File not accessible' };
+        }
+        
+        return { valid: true, size: fileInfo.size };
+      } catch (error) {
+        return { valid: false, reason: 'File access error: ' + error.message };
+      }
+    } catch (error) {
+      return { valid: false, reason: 'Validation error: ' + error.message };
+    }
+  }
+
+  static async getModelPathWithOfflineCheck(category) {
+    const modelConfig = MODEL_PATHS[category];
+    if (!modelConfig) {
+      throw new Error(`Model category '${category}' not found`);
+    }
+    
     const isDownloaded = await this.isModelDownloaded(category);
     
     if (isDownloaded) {
       const localPath = this.getLocalModelPath(category);
       const fileInfo = await FileSystem.getInfoAsync(localPath);
       
-      if (fileInfo.exists) {
-        console.log(`Using local model for ${category}:`, localPath);
-        // Return remote URL for WebView compatibility, but local file exists for offline capability
-        const modelConfig = MODEL_PATHS[category];
-        console.log(`WebView will use remote URL for ${category}:`, modelConfig?.url);
-        return modelConfig?.url;
+      if (fileInfo.exists && fileInfo.size > 10000) { // Ensure file is substantial
+        console.log(`✓ Using local model for ${category}: ${localPath} (${this.formatFileSize(fileInfo.size)})`);
+        return { path: localPath, isLocal: true };
       } else {
-        // File was deleted but still marked as downloaded, clean up
-        console.log(`Local file missing for ${category}, using remote URL`);
+        // File was deleted, corrupted, or too small - clean up storage
+        console.warn(`⚠️ Local file missing/corrupted for ${category}, cleaning up`);
         const downloadedModels = await this.getDownloadedModels();
         delete downloadedModels[category];
         await this.setDownloadedModels(downloadedModels);
+        
+        // Delete the bad file
+        if (fileInfo.exists) {
+          await FileSystem.deleteAsync(localPath);
+        }
       }
     }
     
-    // Fallback to remote URL
+    // If no local model available, force user to download
+    console.log(`❌ No local model for ${category} - download required for offline use`);
+    throw new Error(`Model '${category}' not downloaded. Please download it from the model manager for offline use.`);
+  }
+
+  static async getModelPath(category) {
     const modelConfig = MODEL_PATHS[category];
-    console.log(`Using remote model for ${category}:`, modelConfig?.url);
-    return modelConfig?.url;
+    if (!modelConfig) {
+      throw new Error(`Model category '${category}' not found`);
+    }
+    
+    const isDownloaded = await this.isModelDownloaded(category);
+    
+    if (isDownloaded) {
+      const localPath = this.getLocalModelPath(category);
+      const fileInfo = await FileSystem.getInfoAsync(localPath);
+      
+      if (fileInfo.exists && fileInfo.size > 1000) { // Ensure file is not empty/corrupted
+        console.log(`✓ Using local model for ${category}: ${localPath} (${this.formatFileSize(fileInfo.size)})`);
+        // Return local file URI for WebView to use offline model
+        return localPath;
+      } else {
+        // File was deleted, corrupted, or too small - clean up storage
+        console.warn(`⚠️ Local file missing/corrupted for ${category}, cleaning up and using remote URL`);
+        const downloadedModels = await this.getDownloadedModels();
+        delete downloadedModels[category];
+        await this.setDownloadedModels(downloadedModels);
+        
+        // Optionally delete the bad file
+        if (fileInfo.exists) {
+          await FileSystem.deleteAsync(localPath);
+        }
+      }
+    }
+    
+    // Fallback to remote URL only if no local model
+    console.log(`🌐 Using remote model for ${category}: ${modelConfig.url}`);
+    return modelConfig.url;
   }
 
   static async getDownloadInfo() {
